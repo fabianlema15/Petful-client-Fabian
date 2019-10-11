@@ -19,7 +19,6 @@ class MainPage extends React.Component{
 
   componentDidMount() {
     const customerQueue = Utils.generateFakeQueue();
-    console.log(customerQueue);
     setInterval(this.setUsersTime, 1000)
     Promise.all([Api.get('cat'), Api.get('dog')])
     .then(res => this.setState({cat: res[0], dog: res[1], users: customerQueue.users, time: customerQueue.time, each: customerQueue.each}))
