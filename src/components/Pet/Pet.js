@@ -9,11 +9,11 @@ function Animal(props) {
         <img src={props.pet.imageURL} alt={props.pet.imageDescription} />
       </div>
       <div>
-        <div>Name: <span></span>{props.pet.name}</div>
-        <div>Genre: <span></span>{props.pet.sex}</div>
-        <div>Age: <span></span>{props.pet.age}</div>
-        <div>Breed: <span></span>{props.pet.breed}</div>
-        <div>{props.pet.name} story: <span></span>{props.pet.story}</div>
+        <div><span>Name: </span>{props.pet.name}</div>
+        <div><span>Genre: </span>{props.pet.sex}</div>
+        <div><span>Age: </span>{props.pet.age}</div>
+        <div><span>Breed: </span>{props.pet.breed}</div>
+        <div><span>{props.pet.name} story: </span>{props.pet.story}</div>
       </div>
     </div>
   );

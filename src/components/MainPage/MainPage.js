@@ -81,12 +81,12 @@ class MainPage extends React.Component{
     return (
       <div>
         <h1>Here are the pets for adoption</h1>
-        <h2>Welcome to Petful, here you will be able to adopt a new pet. You have to wait on the line until everyone has selected a pet, then you will able to select adopt option. You can select between a new dog or cat.</h2>
-        <h2>You will be able to look at other pets on the list but you only will can adopt the first of the list.</h2>
+        <h3>Welcome to Petful, here you will be able to adopt a new pet. You have to wait on the line until everyone has selected a pet, then you will able to select adopt option. You can select between a new dog or cat.</h3>
+        <h3>You will be able to look at other pets on the list but you only will can adopt the first of the list.</h3>
         {
           !this.state.adopted? <div>{!this.state.adoptionEnabled ?
-            <h3>There are {this.state.users} pet lovers on the line, Time estimated to wait {this.state.time} second</h3>:
-            <h3>You are able to adopt now</h3>
+            <h4 className='orange'>There are {this.state.users} pet lovers on the line, Time estimated to wait {this.state.time} second</h4>:
+            <h4 className='green'>You are able to adopt now</h4>
           }
 
           { Object.keys(this.state.cat).length>0? <div className="pet-desc" >

@@ -8,6 +8,19 @@ button {
   height: 40px;
   border-radius: 4px;
   margin: 10px;
+  font-size: 15px;
+}
+
+.red {
+  color: red;
+}
+
+.orange {
+  color: orange;
+}
+
+.green {
+  color: green;
 }
 
 .pet-desc {
