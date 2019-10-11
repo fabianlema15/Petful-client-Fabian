@@ -1,0 +1,18 @@
+
+img {
+  max-width: 90%;
+}
+
+button {
+  width: 90px;
+  height: 40px;
+  border-radius: 4px;
+  margin: 10px;
+}
+
+.pet-desc {
+  display: inline-block;
+  width: 40%;
+  margin: 10px;
+  padding: 10px;
+}
