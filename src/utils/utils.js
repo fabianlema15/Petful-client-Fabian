@@ -1,5 +1,5 @@
 const Utils = {
-  generateFakeQueue(){
+  /*generateFakeQueue(){
     let users = 0;
     let time = 0;
     let each = 0;
@@ -11,7 +11,7 @@ const Utils = {
     }
 
     return {users, time, each}
-  }
+  }*/
 }
 
 export default Utils;

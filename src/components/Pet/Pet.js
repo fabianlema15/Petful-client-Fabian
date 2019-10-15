@@ -8,7 +8,7 @@ function Animal(props) {
       <div className='image'>
         <img src={props.pet.imageURL} alt={props.pet.imageDescription} />
       </div>
-      <div>
+      <div className='desc'>
         <div><span>Name: </span>{props.pet.name}</div>
         <div><span>Genre: </span>{props.pet.sex}</div>
         <div><span>Age: </span>{props.pet.age}</div>

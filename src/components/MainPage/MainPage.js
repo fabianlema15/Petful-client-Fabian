@@ -1,11 +1,14 @@
 import React from 'react';
-import Api from '../../services/api'
+import PetsApiService from '../../services/pets-api-service'
+import TokenService from '../../services/token-service'
+import PeopleApiService from '../../services/people-api-service'
 import Pet from '../Pet/Pet'
-import Utils from '../../utils/utils'
 import './MainPage.css'
+
 
 class MainPage extends React.Component{
   state = {
+    users:[],
     dog: {},
     cat: {},
     adoptionEnabled: false,
@@ -18,34 +21,17 @@ class MainPage extends React.Component{
   }
 
   componentDidMount() {
-    const customerQueue = Utils.generateFakeQueue();
-    setInterval(this.setUsersTime, 1000)
-    Promise.all([Api.get('cat'), Api.get('dog')])
-    .then(res => this.setState({cat: res[0], dog: res[1], users: customerQueue.users, time: customerQueue.time, each: customerQueue.each}))
-  }
-
-  setUsersTime = (users, time) => {
-    this.state.time--
-    if (this.state.time > 0 && this.state.time % 5 === 0){
-      let usersWaiting = Math.floor(this.state.time / this.state.each);
-      if (usersWaiting===0) usersWaiting = 1
-      this.setState({users: usersWaiting, time: this.state.time})
-    }
-    if (this.state.time===0){
-      Promise.all([Api.get('cat'), Api.get('dog')])
-      .then(res => this.setState({cat: res[0],
-        dog: res[1],
-        adoptionEnabled: true,
-        catNextEnabled: false,
-        catPrevEnabled: false,
-        dogNextEnabled: false,
-        dogPrevEnabled: false
-      }))
+    const idUser = TokenService.decodeUser();
+    if (idUser) {
+      Promise.all([PeopleApiService.getFrontOfMe(idUser.id), PetsApiService.get('cat'), PetsApiService.get('dog')])
+      .then(res => this.setState({cat: res[1], dog: res[2], users: res[0], adoptionEnabled:res[0].length>0?false:true}))
+    }else{
+      this.props.history.push('/')
     }
   }
 
   adoptAction = (type) => {
-    Api.remove(type)
+    PetsApiService.remove(type)
     .then(res => {
       this.setState({
         adopted:true,
@@ -55,7 +41,7 @@ class MainPage extends React.Component{
   }
 
   nextAction = (type, id) => {
-    Api.next(type, id)
+    PetsApiService.next(type, id)
     .then(res => {
       if (Object.keys(res).length > 0){
         type==='cat' ? this.setState({cat: res, catPrevEnabled:true}) : this.setState({dog: res, dogPrevEnabled:true})
@@ -66,7 +52,7 @@ class MainPage extends React.Component{
   }
 
   prevAction = (type, id) => {
-    Api.prev(type, id)
+    PetsApiService.prev(type, id)
     .then(res => {
       if (Object.keys(res).length > 0){
         type==='cat' ? this.setState({cat: res, catNextEnabled:true}) : this.setState({dog: res, dogNextEnabled:true})
@@ -76,49 +62,71 @@ class MainPage extends React.Component{
     })
   }
 
+  goLanding = () => {
+    this.props.history.push('/')
+  }
+
   render(){
+    const listUsers = this.state.users.map(user => {
+      return <li key={user.id}>{user.name}</li>
+    })
     return (
       <div>
-        <h1>Here are the pets for adoption</h1>
-        <h3>Welcome to Petful, here you will be able to adopt a new pet. You have to wait on the line until everyone has selected a pet, then you will able to select adopt option. You can select between a new dog or cat.</h3>
-        <h3>You will be able to look at other pets on the list but you only will can adopt the first of the list.</h3>
+        <section>
+          <h2>Here are the pets for adoption</h2>
+        </section>
         {
-          !this.state.adopted? <div>{!this.state.adoptionEnabled ?
-            <h4 className='orange'>There are {this.state.users} pet lovers on the line, Time estimated to wait {this.state.time} second</h4>:
-            <h4 className='green'>You are able to adopt now</h4>
-          }
+          !this.state.adopted?
 
-          { Object.keys(this.state.cat).length>0? <div className="pet-desc" >
+          <div>
+          <section>
+          {(!this.state.adoptionEnabled && this.state.users.length>0) ?
+            <div><h5 className='orange'>There are {this.state.users.length} pet lovers on the line</h5>
+            {listUsers}</div>
+            :
+            <h5 className='green'>You are able to adopt now</h5>
+          }
+          </section>
+
+          <section className="pet-desc">
+          { Object.keys(this.state.cat).length>0? <div  >
               <Pet pet={this.state.cat}/>
               <div>
-                  <button disabled={!this.state.adoptionEnabled} onClick={(e) => this.adoptAction('cat')}>Adopt</button>
+                  <button disabled={!this.state.adoptionEnabled} onClick={(e) => this.adoptAction('cat')}>Adopt {this.state.cat.name}</button>
               </div>
-              <div>
-                <button disabled={!this.state.catPrevEnabled} onClick={(e) => this.prevAction('cat', this.state.cat.id)}>Previus</button>
-                <button disabled={!this.state.catNextEnabled} onClick={(e) => this.nextAction('cat', this.state.cat.id)}>Next</button>
-              </div>
-            </div> : <h2>There are not cats availables</h2>
+              {!this.state.adoptionEnabled && <div>
+                <button disabled={!this.state.catPrevEnabled} onClick={(e) => this.prevAction('cat', this.state.cat.id)}>Previous Cat</button>
+                <button disabled={!this.state.catNextEnabled} onClick={(e) => this.nextAction('cat', this.state.cat.id)}>Next Cat</button>
+              </div>}
+            </div> : <h4>There are not cats availables</h4>
           }
 
+          </section>
+          <section className="pet-desc">
 
-          { Object.keys(this.state.dog).length>0? <div className="pet-desc" >
+          { Object.keys(this.state.dog).length>0? <div>
             <Pet pet={this.state.dog}/>
             <div>
-                <button disabled={!this.state.adoptionEnabled} onClick={(e) => this.adoptAction('dog')}>Adopt</button>
+                <button disabled={!this.state.adoptionEnabled} onClick={(e) => this.adoptAction('dog')}>Adopt {this.state.dog.name}</button>
             </div>
-            <div>
-              <button disabled={!this.state.dogPrevEnabled} onClick={(e) => this.prevAction('dog', this.state.dog.id)}>Previus</button>
-              <button disabled={!this.state.dogNextEnabled} onClick={(e) => this.nextAction('dog', this.state.dog.id)}>Next</button>
-            </div>
-            </div> : <h2>There are not dogs availables</h2>
+            {!this.state.adoptionEnabled && <div>
+              <button disabled={!this.state.dogPrevEnabled} onClick={(e) => this.prevAction('dog', this.state.dog.id)}>Previous Dog</button>
+              <button disabled={!this.state.dogNextEnabled} onClick={(e) => this.nextAction('dog', this.state.dog.id)}>Next Dog</button>
+            </div>}
+            </div> : <h4>There are not dogs availables</h4>
           }
-          </div>
-          :
-          <div className="pet-desc">
-            <h2>Thanks, you have adopted</h2>
-            <Pet pet={this.state.pet}/>
+          </section>
 
           </div>
+
+          :
+          <section className="pet-desc">
+            <p>Thanks, you have adopted</p>
+            <Pet pet={this.state.pet}/>
+
+            <button onClick={this.goLanding} >Go to main page</button>
+
+          </section>
         }
 
       </div>

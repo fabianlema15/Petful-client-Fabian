@@ -1,6 +1,6 @@
 import config from '../config'
 
-const GenericApiService = {
+const PetsApiService = {
   get(type) {
       return fetch(`${config.REACT_APP_API_BASE}/${type}`, {
       })
@@ -44,4 +44,4 @@ const GenericApiService = {
 
 }
 
-export default GenericApiService;
+export default PetsApiService;
